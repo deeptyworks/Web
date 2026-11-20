@@ -37,65 +37,152 @@ alignment.</p>
 let marks = [85, 72, 90], total = 0;
 for (let m of marks) total += m;
 let avg = total / marks.length;
-document.write("Total: " + total + "<br>Average: " + avg + "<br>");
+document.write("Total: " + total + "<br>Average: " + avg.toFixed(2) + "<br>");
 if (avg >= 80) document.write("Grade A");
 else if (avg >= 60) document.write("Grade B");
 else document.write("Fail");
 </script>
-
-5. DOM manipulation
-<!DOCTYPE html>
-<html><head>
-<meta name="viewport" content="width=device-width">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
-rel="stylesheet">
-</head><body>
-<nav class="navbar navbar-dark bg-dark px-3"><a class="navbar-brand">My Site</a>
-</nav>
-<div class="container mt-3">
-  <div class="alert alert-success">Welcome!</div>
-  <div class="card p-3 mb-3"><h5>Card Title</h5><button class="btn btn
-primary">Click</button></div>
-  <form>
-    <input class="form-control mb-2" placeholder="Name">
-    <button class="btn btn-success">Submit</button>
-  </form>
-</div>
 </body></html>
-<script>
-let marks = [85, 72, 90], total = 0;
-for (let m of marks) total += m;
-let avg = total / marks.length;
-document.write("Total: " + total + "<br>Average: " + avg + "<br>");
-if (avg >= 80) document.write("Grade A");
-else if (avg >= 60) document.write("Grade B");
-else document.write("Fail");
-</script>
-<h1 id="h">Hello Students!</h1>
-<img id="img" src="a.jpg" width="150"><br>
+
+
+**5. DOM manipulation**
+<!DOCTYPE html>
+<html>
+<body>
+<h1 id="heading">Hello Students!</h1>
+<p id="message">This is the original content.</p>
+<img id="pic" src="image1.jpg" width="200"><br><br>
 <button onclick="change()">Click Me</button>
 <script>
 function change() {
-  document.getElementById("h").innerHTML = "Content Changed!";
-  document.body.style.background = "lightblue";
-  document.getElementById("img").src = "b.jpg";
+  heading.innerHTML = "Welcome to JavaScript!";            // content
+  message.innerHTML = "The content has been changed.";
+  document.body.style.backgroundColor = "lightblue";       // color
+  pic.src = "image2.jpg";                                  // image
 }
-</script
+</script>
+</body>
+</html>
+
+**6.Form Validation**
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Form Validation</title></head><body>
+<form onsubmit="return check()">
+Name <input id="n"><br>
+Email <input id="e"><br>
+Mobile <input id="m"><br>
+Password <input type="password" id="p"><br>
+<button>Register</button>
+</form>
+<script>
+function check() {
+let v = id => document.getElementById(id).value, err = "";
+if (v("n") == "") err = "Enter name";
+else if (!/^\S+@\S+\.\S+$/.test(v("e"))) err = "Invalid email";
+else if (!/^[6-9]\d{9}$/.test(v("m"))) err = "Invalid mobile";
+else if (v("p").length < 8) err = "Password must be 8+ characters";
+alert(err || "Registration successful!");
+return false;
+}
+</script>
+</body></html>
 
 
+**7. Fetch API and JSON**
+<!DOCTYPE html>
+<html>
+<body>
+<h2>User Directory</h2>
+<div id="list"></div>
+<script>
+fetch("https://jsonplaceholder.typicode.com/users")
+.then(res => res.json())
+.then(data => {
+  data.forEach(u => {
+    list.innerHTML += `<p>${u.name} - ${u.email}</p>`;
+  });
+})
+.catch(() => list.innerHTML = "Error loading data");
+</script>
+</body>
+</html>
+
+**8.xamp setup and print**
+Steps
+1. Download and install XAMPP (default folder C:\xampp).
+2. Open XAMPP Control Panel and click Start next to Apache.
+3. Save the program below as C:\xampp\htdocs\hello.php
+4. Open the browser and visit http://localhost/hello.php
+   (do not double-click the file; Apache must run the PHP code)
+hello.php
+<?php
+echo "Hello, World!";
+echo "<br>";
+echo "Welcome to PHP Programming";
+?>
+
+**9. PHP Sessions, Cookies and Login**
+<?php
+session_start();
+if ($_POST) {
+$u = $_POST['u']; $p = $_POST['p'];
+if ($u == "" || $p == "") echo "Fill all fields";
+elseif ($u == "student" && $p == "1234") {
+$_SESSION['u'] = $u;
+setcookie("u", $u, time() + 3600);
+echo "Welcome $u";
+} else echo "Invalid login";
+}
+?>
+<form method="post">
+User <input name="u"><br>
+Pass <input type="password" name="p"><br>
+<button>Login</button>
+</form>
+<?php
+if (isset($_SESSION['u'])) echo "Session: " . htmlspecialchars($_SESSION['u']) . "<br>";
+if (isset($_COOKIE['u'])) echo "Cookie: " . htmlspecialchars($_COOKIE['u']);
+?>
+<p><small>Login: student / 1234. Cookie shows after the next reload.</small></p>
 
 
-
-
-
-
-
-
-
-
-
-
-
+**10.crud**
+<?php
+// Creates the database and table automatically - no phpMyAdmin step needed
+$c = mysqli_connect("localhost", "root", "");
+mysqli_query($c, "CREATE DATABASE IF NOT EXISTS college");
+mysqli_select_db($c, "college");
+mysqli_query($c, "CREATE TABLE IF NOT EXISTS students(
+ id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50), course VARCHAR(50))");
+if ($_POST) {
+ $id = (int)($_POST['id'] ?? 0);
+ $name = mysqli_real_escape_string($c, $_POST['name'] ?? '');
+ $course = mysqli_real_escape_string($c, $_POST['course'] ?? '');
+ if (isset($_POST['insert']))
+ mysqli_query($c, "INSERT INTO students(name,course) VALUES('$name','$course')");
+ if (isset($_POST['update']))
+ mysqli_query($c, "UPDATE students SET name='$name', course='$course' WHERE id=$id");
+ if (isset($_POST['delete']))
+ mysqli_query($c, "DELETE FROM students WHERE id=$id");
+ header("Location: " . $_SERVER['PHP_SELF']); exit;
+}
+$r = mysqli_query($c, "SELECT * FROM students");
+?>
+<form method="post">
+ID <input name="id" size="3"> Name <input name="name"> Course <input name="course"><br>
+<button name="insert">Insert</button>
+<button name="update">Update</button>
+<button name="delete">Delete</button>
+</form>
+<table border="1">
+<tr><th>ID</th><th>Name</th><th>Course</th></tr>
+<?php
+while ($s = mysqli_fetch_assoc($r))
+ echo "<tr><td>{$s['id']}</td><td>" . htmlspecialchars($s['name']) .
+ "</td><td>" . htmlspecialchars($s['course']) . "</td></tr>";
+?>
+</table>
+<small>Insert: fill Name + Course. Update/Delete: fill the ID from the table.</small
 
 
 
